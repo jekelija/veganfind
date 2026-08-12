@@ -1,0 +1,15 @@
+{
+  "version": 8,
+  "name": "VeganFind offline fallback",
+  "metadata": {
+    "description": "Minimal style with no external tiles. Use by setting NEXT_PUBLIC_MAP_STYLE_URL=/map-style-fallback.json — handy for offline dev or when the tile provider is unreachable. Markers render over a plain background."
+  },
+  "sources": {},
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": { "background-color": "#e8ebe6" }
+    }
+  ]
+}

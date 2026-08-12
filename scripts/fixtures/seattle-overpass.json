@@ -1,0 +1,211 @@
+{
+  "_sample": true,
+  "_comment": "HAND-WRITTEN SAMPLE — not a real Overpass response. The Overpass API was unreachable from the environment where this repo was scaffolded. These are real, well-known Seattle vegan/vegetarian spots with approximate coordinates and realistic OSM-style tags (element ids are fabricated). Replace this file with a real snapshot by running: npm run seed -- --live",
+  "version": 0.6,
+  "generator": "VeganFind sample fixture (Overpass API shape)",
+  "osm3s": {
+    "timestamp_osm_base": "2026-08-12T00:00:00Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+    {
+      "type": "node",
+      "id": 4456441201,
+      "lat": 47.61397,
+      "lon": -122.31678,
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Plum Bistro",
+        "cuisine": "vegan",
+        "diet:vegan": "only",
+        "diet:vegetarian": "only",
+        "addr:housenumber": "1429",
+        "addr:street": "12th Avenue",
+        "addr:city": "Seattle",
+        "addr:postcode": "98122",
+        "website": "https://plumbistro.com"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4456441202,
+      "lat": 47.67596,
+      "lon": -122.31817,
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Wayward Vegan Cafe",
+        "cuisine": "american;breakfast",
+        "diet:vegan": "only",
+        "diet:vegetarian": "only",
+        "addr:housenumber": "801",
+        "addr:street": "Northeast 65th Street",
+        "addr:city": "Seattle"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4456441203,
+      "lat": 47.66131,
+      "lon": -122.3369,
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Harvest Beat",
+        "cuisine": "vegan",
+        "diet:vegan": "only",
+        "diet:vegetarian": "only",
+        "addr:housenumber": "1711",
+        "addr:street": "North 45th Street",
+        "addr:city": "Seattle"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4456441204,
+      "lat": 47.66727,
+      "lon": -122.31294,
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Araya's Place",
+        "cuisine": "thai",
+        "diet:vegan": "only",
+        "diet:vegetarian": "only",
+        "addr:housenumber": "5240",
+        "addr:street": "University Way Northeast",
+        "addr:city": "Seattle"
+      }
+    },
+    {
+      "type": "way",
+      "id": 336221101,
+      "center": { "lat": 47.62384, "lon": -122.2952 },
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Cafe Flora",
+        "cuisine": "vegetarian",
+        "diet:vegetarian": "only",
+        "diet:vegan": "yes",
+        "addr:housenumber": "2901",
+        "addr:street": "East Madison Street",
+        "addr:city": "Seattle",
+        "building": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4456441205,
+      "lat": 47.66413,
+      "lon": -122.31513,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Chaco Canyon Organic Cafe",
+        "cuisine": "vegan;organic",
+        "diet:vegan": "yes",
+        "diet:vegetarian": "only",
+        "organic": "yes",
+        "addr:housenumber": "4757",
+        "addr:street": "12th Avenue Northeast",
+        "addr:city": "Seattle"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4456441206,
+      "lat": 47.61283,
+      "lon": -122.319,
+      "tags": {
+        "amenity": "ice_cream",
+        "name": "Frankie & Jo's",
+        "cuisine": "ice_cream",
+        "diet:vegan": "only",
+        "addr:housenumber": "1010",
+        "addr:street": "East Union Street",
+        "addr:city": "Seattle"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4456441207,
+      "lat": 47.6203,
+      "lon": -122.3374,
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Kati Vegan Thai",
+        "cuisine": "thai",
+        "diet:vegan": "only",
+        "addr:housenumber": "320",
+        "addr:street": "Terry Avenue North",
+        "addr:city": "Seattle"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4456441208,
+      "lat": 47.65036,
+      "lon": -122.3499,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Flying Apron Bakery",
+        "cuisine": "bakery",
+        "diet:vegan": "only",
+        "diet:gluten_free": "only",
+        "addr:housenumber": "3510",
+        "addr:street": "Fremont Avenue North",
+        "addr:city": "Seattle"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4456441209,
+      "lat": 47.5497,
+      "lon": -122.3183,
+      "tags": {
+        "amenity": "bar",
+        "name": "Georgetown Liquor Company",
+        "diet:vegetarian": "only",
+        "diet:vegan": "yes",
+        "addr:housenumber": "5501",
+        "addr:street": "Airport Way South",
+        "addr:city": "Seattle"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4456441210,
+      "lat": 47.6141,
+      "lon": -122.3233,
+      "tags": {
+        "amenity": "bar",
+        "name": "Life on Mars",
+        "diet:vegan": "only",
+        "addr:housenumber": "722",
+        "addr:street": "East Pike Street",
+        "addr:city": "Seattle"
+      }
+    },
+    {
+      "type": "way",
+      "id": 336221102,
+      "center": { "lat": 47.669, "lon": -122.313 },
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Pizza Pi Vegan Pizzeria",
+        "cuisine": "pizza",
+        "diet:vegan": "only",
+        "diet:vegetarian": "only",
+        "addr:city": "Seattle",
+        "building": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4456441211,
+      "lat": 47.61,
+      "lon": -122.34,
+      "tags": {
+        "amenity": "fast_food",
+        "cuisine": "mexican",
+        "diet:vegan": "yes"
+      }
+    }
+  ]
+}

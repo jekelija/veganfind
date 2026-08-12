@@ -1,0 +1,125 @@
+{
+  "metadata": {
+    "title": "VeganFind — {region}",
+    "description": "A community-driven map for finding vegan and vegan-friendly food in {region}. Seeded from OpenStreetMap, verified by crowd votes."
+  },
+  "header": {
+    "appName": "VeganFind",
+    "tagline": "Community-verified vegan food in {region}"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signedIn": "Signed in"
+  },
+  "login": {
+    "metaTitle": "Sign in — VeganFind",
+    "title": "Sign in to VeganFind",
+    "subtitle": "An account lets you add places, report vegan status, and vote.",
+    "backToMap": "← Back to the map",
+    "readOnlyNotice": "Sign-in isn't set up on this deployment yet — the map is running in read-only mode. Browsing works fine; submissions and votes are disabled.",
+    "checkEmailTitle": "Check your email",
+    "checkEmailBody": "We sent a magic sign-in link to <strong>{email}</strong>. Open it on this device to finish signing in.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "sendLink": "Email me a sign-in link",
+    "sending": "Sending…",
+    "noPasswordHint": "No password needed — we'll email you a one-time sign-in link."
+  },
+  "map": {
+    "ariaLabel": "Map of vegan and vegan-friendly places",
+    "loading": "Loading map…",
+    "readOnlyBadge": "Read-only mode",
+    "signInToContribute": "Sign in to contribute",
+    "addPlace": "Add a place",
+    "cancelAdding": "Cancel adding",
+    "dropPinHint": "Click the map where the place is to drop a pin",
+    "listToggleShow": "Show list view",
+    "listToggleHide": "Show map view",
+    "placesShown": "{count, plural, one {# place shown} other {# places shown}}"
+  },
+  "placeList": {
+    "title": "Places in view",
+    "empty": "No places in this map view yet. Try moving or zooming out the map."
+  },
+  "legend": {
+    "show": "Legend & filters",
+    "hide": "Hide legend",
+    "regionLabel": "Map legend and filters",
+    "filterLabel": "Filter places",
+    "filterAll": "All",
+    "markerConfirmedLabel": "Solid + white ring:",
+    "markerConfirmedDescription": "confirmed by community votes",
+    "markerUnverifiedLabel": "Faded:",
+    "markerUnverifiedDescription": "unverified — from OpenStreetMap tags"
+  },
+  "status": {
+    "fully_vegan": "Fully vegan",
+    "vegan_friendly": "Vegan-friendly",
+    "not_vegan": "Not vegan",
+    "closed": "Permanently closed",
+    "unknown": "Unknown"
+  },
+  "verification": {
+    "confirmed": "Confirmed — {confidence, number, percent} confidence",
+    "unverified": "Unverified — from OpenStreetMap",
+    "none": "No vegan info yet"
+  },
+  "addPlace": {
+    "title": "Add a place",
+    "pinAt": "Pin at {lat, number, ::.00000}, {lng, number, ::.00000} — click the map again to move it.",
+    "nameLabel": "Name",
+    "requiredMark": "*",
+    "namePlaceholder": "e.g. Frankie & Jo's",
+    "addressLabel": "Address",
+    "optionalMark": "(optional)",
+    "addressPlaceholder": "Street, city",
+    "nameRequired": "A name is required.",
+    "cancel": "Cancel",
+    "save": "Save place",
+    "saving": "Saving…"
+  },
+  "placeDetail": {
+    "loading": "Loading…",
+    "fallbackName": "Place",
+    "cuisine": "Cuisine: {cuisines}",
+    "close": "Close details",
+    "loadError": "Couldn't load this place. Please try again.",
+    "retry": "Retry",
+    "closedNotice": "This place is marked as permanently closed.",
+    "osmTagsLabel": "OSM tags",
+    "sourceOsm": "Seeded from OpenStreetMap",
+    "sourceCommunity": "Added by the community",
+    "readOnlyNotice": "Read-only mode — sign-in isn't set up on this server, so voting and reports are disabled.",
+    "signInToContribute": "Sign in to contribute",
+    "reportsHeading": "{count, plural, one {Community reports (#)} other {Community reports (#)}}",
+    "noReports": "No reports yet. Been here? Let everyone know what's vegan."
+  },
+  "submissionForm": {
+    "titleUpdate": "Update your report",
+    "titleNew": "Update vegan status",
+    "statusLegend": "Vegan status",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "Optional note — e.g. clearly labeled vegan menu",
+    "pickStatus": "Pick a status first.",
+    "saved": "Thanks — your report was saved.",
+    "submit": "Submit report",
+    "submitting": "Submitting…"
+  },
+  "votes": {
+    "yourReport": "Your report",
+    "agreeWithCount": "Agree with this report, {count, plural, one {# vote} other {# votes}}",
+    "disagreeWithCount": "Disagree with this report, {count, plural, one {# vote} other {# votes}}",
+    "upvotesLabel": "Agree votes:",
+    "downvotesLabel": "Disagree votes:",
+    "signInToVote": "Sign in to vote"
+  },
+  "errors": {
+    "unauthenticated": "You need to sign in to do that.",
+    "rateLimited": "Easy there — too many requests. Wait a minute and try again.",
+    "readOnly": "VeganFind is in read-only mode right now, so contributions are paused.",
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error — please try again.",
+    "placesLoad": "Couldn't load places for this area — move the map to retry."
+  }
+}
