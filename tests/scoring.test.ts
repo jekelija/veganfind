@@ -1,10 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
+  NEW_ACCOUNT_DAMPING,
+  NEW_ACCOUNT_WINDOW_DAYS,
   computePlaceScore,
   statusFromOsmTags,
+  voteWeight,
   wilsonLowerBound,
   type SubmissionTally,
 } from "@/lib/scoring";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const NOW = new Date("2026-08-12T12:00:00Z");
+const daysAgo = (days: number) => new Date(NOW.getTime() - days * DAY_MS);
 
 describe("wilsonLowerBound", () => {
   it("returns 0 for 0 votes", () => {
@@ -40,12 +47,39 @@ describe("wilsonLowerBound", () => {
   });
 });
 
+describe("voteWeight", () => {
+  it("gives established accounts their full trust score", () => {
+    expect(voteWeight(1.0, daysAgo(30), NOW)).toBe(1.0);
+    expect(voteWeight(0.8, daysAgo(NEW_ACCOUNT_WINDOW_DAYS), NOW)).toBe(0.8);
+  });
+
+  it("dampens accounts younger than the window", () => {
+    expect(voteWeight(1.0, daysAgo(0), NOW)).toBe(NEW_ACCOUNT_DAMPING);
+    expect(voteWeight(1.0, daysAgo(NEW_ACCOUNT_WINDOW_DAYS - 1), NOW)).toBe(
+      NEW_ACCOUNT_DAMPING,
+    );
+    expect(voteWeight(0.5, daysAgo(1), NOW)).toBe(0.5 * NEW_ACCOUNT_DAMPING);
+  });
+
+  it("never goes negative", () => {
+    expect(voteWeight(-3, daysAgo(30), NOW)).toBe(0);
+  });
+});
+
 describe("computePlaceScore", () => {
   const tally = (
     status: SubmissionTally["status"],
-    upvotes = 0,
-    downvotes = 0,
-  ): SubmissionTally => ({ status, upvotes, downvotes });
+    upvoteWeight = 0,
+    downvoteWeight = 0,
+    submitterWeight = 1,
+    voteCount?: number,
+  ): SubmissionTally => ({
+    status,
+    upvoteWeight,
+    downvoteWeight,
+    submitterWeight,
+    voteCount: voteCount ?? Math.round(upvoteWeight + downvoteWeight),
+  });
 
   it("returns null for no submissions", () => {
     expect(computePlaceScore([])).toBeNull();
@@ -88,6 +122,26 @@ describe("computePlaceScore", () => {
     expect(result!.status).toBe("closed");
     // Enough support that the closure rule (score >= 0.5) would apply.
     expect(result!.score).toBeGreaterThanOrEqual(0.5);
+  });
+
+  it("a dampened submitter scores lower than a trusted one", () => {
+    const trusted = computePlaceScore([tally("fully_vegan", 0, 0, 1)]);
+    const dampened = computePlaceScore([
+      tally("fully_vegan", 0, 0, NEW_ACCOUNT_DAMPING),
+    ]);
+    expect(dampened!.status).toBe("fully_vegan");
+    expect(dampened!.score).toBeLessThan(trusted!.score);
+  });
+
+  it("dampened upvotes cannot outvote the same number of full-weight votes", () => {
+    // 3 new-account upvotes on 'not_vegan' vs 2 established upvotes on
+    // 'fully_vegan': raw counts favor the brigade, weights don't.
+    const result = computePlaceScore([
+      tally("fully_vegan", 2, 0, 1, 2),
+      tally("not_vegan", 3 * NEW_ACCOUNT_DAMPING, 0, NEW_ACCOUNT_DAMPING, 3),
+    ]);
+    expect(result!.status).toBe("fully_vegan");
+    expect(result!.voteCount).toBe(5); // raw count preserved for display
   });
 });
 

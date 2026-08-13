@@ -10,7 +10,7 @@ import { useUser } from "@/lib/auth/useUser";
  */
 export default function AuthCorner() {
   const t = useTranslations("auth");
-  const { user, authConfigured, loading } = useUser();
+  const { user, authConfigured, isAdmin, loading } = useUser();
 
   if (loading || !authConfigured) return null;
 
@@ -27,6 +27,14 @@ export default function AuthCorner() {
 
   return (
     <div className="flex items-center gap-3">
+      {isAdmin && (
+        <Link
+          href="/admin"
+          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-500 hover:text-neutral-900 dark:border-neutral-600 dark:text-neutral-300 dark:hover:text-neutral-100"
+        >
+          {t("adminQueue")}
+        </Link>
+      )}
       <span
         className="hidden max-w-52 truncate text-sm text-neutral-600 sm:inline dark:text-neutral-300"
         title={user.email ?? undefined}

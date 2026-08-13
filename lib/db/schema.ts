@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   pgTable,
   uuid,
@@ -33,6 +34,12 @@ export type VeganStatus = (typeof VEGAN_STATUSES)[number];
 
 export const PLACE_SOURCES = ["osm", "user"] as const;
 export type PlaceSource = (typeof PLACE_SOURCES)[number];
+
+export const FLAG_REASONS = ["incorrect", "spam", "abuse", "other"] as const;
+export type FlagReason = (typeof FLAG_REASONS)[number];
+
+export const FLAG_STATUSES = ["open", "resolved", "dismissed"] as const;
+export type FlagStatus = (typeof FLAG_STATUSES)[number];
 
 // ---------------------------------------------------------------------------
 // Domain A — place directory (ODbL-derived)
@@ -86,6 +93,8 @@ export const profiles = pgTable("profiles", {
   email: text("email").unique(),
   trustScore: real("trust_score").notNull().default(1.0),
   banned: boolean("banned").notNull().default(false),
+  // Granted manually (SQL) — no self-service path on purpose.
+  isAdmin: boolean("is_admin").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -139,6 +148,66 @@ export const votes = pgTable(
  * Derived, recomputed synchronously in the same transaction as every
  * submission/vote write (PLAN.md: no job queue). This is what the API serves.
  */
+/**
+ * Community flags for the admin review queue (M3). A flag targets a
+ * submission (submission_id set) or a whole place (submission_id null);
+ * place_id is always set so the queue can show context either way.
+ * Partial unique indexes allow one OPEN flag per user per target —
+ * resolved/dismissed history never blocks a new report.
+ */
+export const flags = pgTable(
+  "flags",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    placeId: uuid("place_id")
+      .notNull()
+      .references(() => places.id, { onDelete: "cascade" }),
+    // set null (not cascade): when an admin removes a flagged submission the
+    // resolved flag rows stay behind as an audit trail. Open flags are always
+    // resolved in the same transaction as the delete, so a nulled
+    // submission_id can never turn an open submission flag into a place flag.
+    submissionId: uuid("submission_id").references(() => veganSubmissions.id, {
+      onDelete: "set null",
+    }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id),
+    reason: text("reason", { enum: FLAG_REASONS }).notNull(),
+    note: text("note"),
+    status: text("status", { enum: FLAG_STATUSES }).notNull().default("open"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    resolvedBy: uuid("resolved_by").references(() => profiles.id),
+  },
+  (t) => [
+    index("flags_status_created_idx").on(t.status, t.createdAt),
+    uniqueIndex("flags_submission_user_open_uq")
+      .on(t.submissionId, t.userId)
+      .where(sql`${t.status} = 'open' and ${t.submissionId} is not null`),
+    uniqueIndex("flags_place_user_open_uq")
+      .on(t.placeId, t.userId)
+      .where(sql`${t.status} = 'open' and ${t.submissionId} is null`),
+  ],
+);
+
+/**
+ * Sliding-window rate limiting (M3): one row per counted write, checked and
+ * inserted by lib/rate-limit.ts. Global across serverless instances, unlike
+ * the in-memory limiter it replaced. Expired rows for a key are deleted
+ * opportunistically on that key's next allowed write.
+ */
+export const rateLimitEvents = pgTable(
+  "rate_limit_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    key: text("key").notNull(), // "user:<uuid>" | "ip:<addr>"
+    at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("rate_limit_events_key_at_idx").on(t.key, t.at)],
+);
+
 export const placeScores = pgTable("place_scores", {
   placeId: uuid("place_id")
     .primaryKey()

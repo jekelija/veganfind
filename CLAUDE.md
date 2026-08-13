@@ -2,7 +2,7 @@
 
 # VeganFind — project context
 
-Community-driven vegan food map (HappyCow alternative), launching Seattle-only. **PLAN.md is the roadmap and the source of truth for architecture decisions — read it before structural changes.** Milestones M1 (read-only map) and M2 (auth/submissions/voting) are built and verified; next up per PLAN.md: M3 (trust & moderation), M4 (launch polish + GDPR package).
+Community-driven vegan food map (HappyCow alternative), launching Seattle-only. **PLAN.md is the roadmap and the source of truth for architecture decisions — read it before structural changes.** Milestones M1 (read-only map), M2 (auth/submissions/voting), and M3 (trust & moderation: vote-weight dampening, flags + admin review queue at `/[locale]/admin`, Postgres-backed rate limiting) are built and verified; next up per PLAN.md: M4 (launch polish + GDPR package).
 
 ## Commands
 
@@ -31,7 +31,9 @@ Community-driven vegan food map (HappyCow alternative), launching Seattle-only. 
 - **Read-only mode is a feature:** with Supabase env vars absent, GETs work and write endpoints return 503. Nothing may touch Supabase at import time.
 - **Seed fixture is SAMPLE data** (`"_sample": true` marker): Overpass was unreachable from the build sandbox, so `scripts/fixtures/seattle-overpass.json` is hand-written with fabricated OSM ids. Run `npm run seed -- --live` before anything real; a real refresh won't overwrite sample rows (different `osm_id`s) — reset the places tables when switching.
 - **No fonts from Google at build time** (system font stack on purpose); `public/map-style-fallback.json` + `NEXT_PUBLIC_MAP_STYLE_URL=/map-style-fallback.json` gives an offline/tile-less map for dev and the a11y scan.
-- **Rate limiter is per-instance in-memory** (`lib/rate-limit.ts`) — fine for MVP, replace with Postgres-based limiting before real launch (noted in PLAN.md).
+- **Rate limiter is Postgres-backed** (`lib/rate-limit.ts` + `rate_limit_events` table, 30 writes/hour/key): `rateLimitResponse` is async — new write handlers must `await` it, or the truthy Promise 429s every request.
+- **Admin is granted manually** (`update profiles set is_admin = true where email = '…'`) — no self-service path on purpose. Admin routes gate on `requireAdmin` in `lib/auth/server.ts`; the queue UI at `/[locale]/admin` handles 401/403 as a "not authorized" state.
+- **Moderation deletes have ordering rules**: resolve open flags *before* deleting a flagged submission (the FK sets `flags.submission_id` null, and only resolved rows are exempt from the one-open-flag partial unique indexes); on place removal delete flags explicitly first for the same reason. See `app/api/admin/flags/[id]/route.ts`.
 
 ## Environment
 

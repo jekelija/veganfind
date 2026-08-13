@@ -15,7 +15,7 @@ export async function POST(
 ) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
-  const limited = rateLimitResponse(auth.user.id, request);
+  const limited = await rateLimitResponse(auth.user.id, request);
   if (limited) return limited;
 
   const { id: placeId } = await params;

@@ -67,8 +67,8 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 }
 
 export type RequireUserResult =
-  | { user: SessionUser; response?: undefined }
-  | { user?: undefined; response: Response };
+  | { user: SessionUser; isAdmin: boolean; response?: undefined }
+  | { user?: undefined; isAdmin?: undefined; response: Response };
 
 /**
  * Gate for write handlers: 503 in read-only mode, 401 when signed out,
@@ -101,7 +101,10 @@ export async function requireUser(): Promise<RequireUserResult> {
       target: schema.profiles.id,
       set: { email: user.email },
     })
-    .returning({ banned: schema.profiles.banned });
+    .returning({
+      banned: schema.profiles.banned,
+      isAdmin: schema.profiles.isAdmin,
+    });
   if (profile?.banned) {
     return {
       response: Response.json(
@@ -110,5 +113,23 @@ export async function requireUser(): Promise<RequireUserResult> {
       ),
     };
   }
-  return { user };
+  return { user, isAdmin: profile?.isAdmin ?? false };
+}
+
+/**
+ * Gate for /api/admin/* handlers: everything requireUser checks, plus
+ * profiles.is_admin (granted manually via SQL — no self-service path).
+ */
+export async function requireAdmin(): Promise<RequireUserResult> {
+  const auth = await requireUser();
+  if (auth.response) return auth;
+  if (!auth.isAdmin) {
+    return {
+      response: Response.json(
+        { error: "Admin access required." },
+        { status: 403 },
+      ),
+    };
+  }
+  return auth;
 }

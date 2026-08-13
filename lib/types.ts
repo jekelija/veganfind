@@ -1,6 +1,11 @@
-import type { PlaceSource, VeganStatus } from "./db/schema";
+import type {
+  FlagReason,
+  FlagStatus,
+  PlaceSource,
+  VeganStatus,
+} from "./db/schema";
 
-export type { PlaceSource, VeganStatus };
+export type { FlagReason, FlagStatus, PlaceSource, VeganStatus };
 
 /**
  * API CONTRACT — shared between the map UI and the route handlers.
@@ -16,11 +21,21 @@ export type { PlaceSource, VeganStatus };
  *        body: CreateSubmissionBody      caller's single submission for the place)
  *   POST /api/submissions/:id/votes  -> { ok: true }                    (auth)
  *        body: CreateVoteBody
+ *   POST /api/places/:id/flags       -> { ok: true }                    (auth; flag a place;
+ *        body: CreateFlagBody            idempotent per open (place, user))
+ *   POST /api/submissions/:id/flags  -> { ok: true }                    (auth; flag a submission;
+ *        body: CreateFlagBody            idempotent per open (submission, user))
  *   GET  /api/me                     -> MeResponse (200 with user: null when signed out)
  *
+ * Admin (requires profiles.is_admin, else 403):
+ *   GET  /api/admin/flags            -> AdminFlagsResponse (open flags, oldest first)
+ *   POST /api/admin/flags/:id        -> { ok: true }
+ *        body: ResolveFlagBody
+ *
  * Errors: non-2xx responses carry { error: string }. Write endpoints return
- * 401 when unauthenticated, 429 when rate-limited, and 503 when the server
- * is not configured for auth (Supabase env vars absent — read-only mode).
+ * 401 when unauthenticated, 403 when banned or (admin routes) not an admin,
+ * 429 when rate-limited, and 503 when the server is not configured for auth
+ * (Supabase env vars absent — read-only mode).
  */
 
 /** How confident we are in the displayed status. */
@@ -89,10 +104,62 @@ export interface CreateVoteBody {
   value: -1 | 1;
 }
 
+export interface CreateFlagBody {
+  reason: FlagReason;
+  note?: string;
+}
+
+/** One row in the admin review queue, with enough context to act on. */
+export interface AdminFlagView {
+  id: string;
+  reason: FlagReason;
+  note: string | null;
+  createdAt: string; // ISO
+  reporterEmail: string | null;
+  place: {
+    id: string;
+    name: string;
+    source: PlaceSource;
+    closed: boolean;
+  };
+  /** Null when the flag targets the whole place. */
+  submission: {
+    id: string;
+    status: VeganStatus;
+    note: string | null;
+    authorEmail: string | null;
+    authorBanned: boolean;
+  } | null;
+}
+
+export interface AdminFlagsResponse {
+  flags: AdminFlagView[];
+}
+
+/**
+ * dismiss            — any flag: mark it dismissed, change nothing else.
+ * remove_submission  — submission flags: delete the submission (+ its votes),
+ *                      resolve every open flag on it, recompute the score.
+ * ban_author         — submission flags: remove_submission AND ban the author.
+ * remove_place       — place flags on user-added places only: delete the place
+ *                      and everything under it.
+ */
+export type FlagAction =
+  | "dismiss"
+  | "remove_submission"
+  | "ban_author"
+  | "remove_place";
+
+export interface ResolveFlagBody {
+  action: FlagAction;
+}
+
 export interface MeResponse {
   user: { id: string; email: string | null } | null;
   /** False when Supabase env vars are absent — UI should hide auth affordances. */
   authConfigured: boolean;
+  /** True when the signed-in user may access /admin. */
+  isAdmin: boolean;
 }
 
 export const OSM_ATTRIBUTION = "© OpenStreetMap contributors";

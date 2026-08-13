@@ -10,7 +10,36 @@
   "auth": {
     "signIn": "Sign in",
     "signOut": "Sign out",
-    "signedIn": "Signed in"
+    "signedIn": "Signed in",
+    "adminQueue": "Review queue"
+  },
+  "admin": {
+    "metaTitle": "Review queue — VeganFind",
+    "title": "Moderation queue",
+    "subtitle": "Open community reports, oldest first.",
+    "backToMap": "← Back to the map",
+    "loading": "Loading…",
+    "empty": "No open reports. All clear!",
+    "forbidden": "This page needs an admin account. Sign in with one and try again.",
+    "loadError": "Couldn't load the queue. Please try again.",
+    "retry": "Retry",
+    "queueCount": "{count, plural, one {# open report} other {# open reports}}",
+    "flaggedPlace": "Whole place",
+    "flaggedSubmission": "Community report",
+    "sourceOsm": "From OpenStreetMap",
+    "sourceUser": "User-added",
+    "closedBadge": "Closed",
+    "reportedBy": "Flagged by {email}",
+    "authorLabel": "Written by {email}",
+    "authorBanned": "banned",
+    "unknownUser": "unknown account",
+    "actionDismiss": "Dismiss",
+    "actionRemoveSubmission": "Remove report",
+    "actionBanAuthor": "Remove & ban author",
+    "actionRemovePlace": "Remove place",
+    "confirmBanAuthor": "Ban this account and remove their report? They won't be able to contribute again.",
+    "confirmRemovePlace": "Delete this place and every report on it? This can't be undone.",
+    "actionDone": "Done — the queue has been updated."
   },
   "login": {
     "metaTitle": "Sign in — VeganFind",
@@ -113,6 +142,23 @@
     "upvotesLabel": "Agree votes:",
     "downvotesLabel": "Disagree votes:",
     "signInToVote": "Sign in to vote"
+  },
+  "flags": {
+    "reportSubmission": "Flag for review",
+    "reportPlace": "Report a problem with this place",
+    "reasonLabel": "Reason",
+    "reasons": {
+      "incorrect": "Incorrect information",
+      "spam": "Spam",
+      "abuse": "Abusive content",
+      "other": "Something else"
+    },
+    "noteLabel": "Details (optional)",
+    "notePlaceholder": "Anything the reviewers should know",
+    "submit": "Send report",
+    "submitting": "Sending…",
+    "cancel": "Cancel",
+    "thanks": "Thanks — a moderator will take a look."
   },
   "errors": {
     "unauthenticated": "You need to sign in to do that.",

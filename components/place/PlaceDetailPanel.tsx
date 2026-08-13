@@ -9,6 +9,7 @@ import { useModalDialog } from "@/components/useModalDialog";
 import StatusBadge from "@/components/place/StatusBadge";
 import SubmissionItem from "@/components/place/SubmissionItem";
 import SubmissionForm from "@/components/place/SubmissionForm";
+import FlagButton from "@/components/place/FlagButton";
 
 const TITLE_ID = "place-detail-title";
 
@@ -28,6 +29,7 @@ export default function PlaceDetailPanel({
   onPlacesChanged: () => void;
 }) {
   const t = useTranslations("placeDetail");
+  const tFlags = useTranslations("flags");
   const format = useFormatter();
   const [place, setPlace] = useState<PlaceDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -234,6 +236,13 @@ export default function PlaceDetailPanel({
                   </ul>
                 )}
               </div>
+
+              {!auth.loading && signedIn && (
+                <FlagButton
+                  endpoint={`/api/places/${place.id}/flags`}
+                  label={tFlags("reportPlace")}
+                />
+              )}
             </div>
           </>
         )}

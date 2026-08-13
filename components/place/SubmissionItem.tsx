@@ -5,6 +5,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { SubmissionView, CreateVoteBody } from "@/lib/types";
 import { STATUS_TEXT_CLASSES, apiErrorMessage } from "@/components/format";
+import FlagButton from "@/components/place/FlagButton";
 
 function ArrowIcon({ up }: { up: boolean }) {
   return (
@@ -39,6 +40,7 @@ export default function SubmissionItem({
   const t = useTranslations("votes");
   const tStatus = useTranslations("status");
   const tErrors = useTranslations("errors");
+  const tFlags = useTranslations("flags");
   const format = useFormatter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -109,6 +111,12 @@ export default function SubmissionItem({
           <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">
             {createdAtLabel}
           </p>
+          {signedIn && !submission.isMine && (
+            <FlagButton
+              endpoint={`/api/submissions/${submission.id}/flags`}
+              label={tFlags("reportSubmission")}
+            />
+          )}
         </div>
 
         <div className="flex shrink-0 items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">

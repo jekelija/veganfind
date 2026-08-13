@@ -8,9 +8,35 @@ import type { VeganStatus } from "./db/schema";
  * is the Wilson lower bound of its approval (submitter counts as one implicit
  * upvote). The place's winning status is the one with the highest summed
  * weight; the place score is that status's share-weighted confidence.
+ *
+ * TRUST WEIGHTING (M3): every vote — including the submitter's implicit
+ * upvote — is weighted by {@link voteWeight}: the voter's trust score,
+ * dampened for brand-new accounts. Wilson works fine on fractional counts.
  */
 
 const Z = 1.96; // 95% confidence
+
+/** Accounts younger than this get their votes dampened… */
+export const NEW_ACCOUNT_WINDOW_DAYS = 7;
+/** …to this fraction of their normal weight. */
+export const NEW_ACCOUNT_DAMPING = 0.5;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Weight of one vote: the voter's trust score (floored at 0), halved while
+ * the account is younger than {@link NEW_ACCOUNT_WINDOW_DAYS}. Makes
+ * fresh-account vote brigades half as loud without silencing anyone.
+ */
+export function voteWeight(
+  trustScore: number,
+  accountCreatedAt: Date,
+  now: Date = new Date(),
+): number {
+  const ageMs = now.getTime() - accountCreatedAt.getTime();
+  const isNew = ageMs < NEW_ACCOUNT_WINDOW_DAYS * DAY_MS;
+  return Math.max(0, trustScore) * (isNew ? NEW_ACCOUNT_DAMPING : 1);
+}
 
 /** Wilson score interval lower bound for a Bernoulli proportion. */
 export function wilsonLowerBound(positive: number, total: number): number {
@@ -25,8 +51,14 @@ export function wilsonLowerBound(positive: number, total: number): number {
 
 export interface SubmissionTally {
   status: VeganStatus;
-  upvotes: number; // explicit upvotes, NOT counting the submitter
-  downvotes: number;
+  /** Trust-weighted sum of explicit upvotes, NOT counting the submitter. */
+  upvoteWeight: number;
+  /** Trust-weighted sum of explicit downvotes. */
+  downvoteWeight: number;
+  /** The submitter's own vote weight — their implicit upvote. */
+  submitterWeight: number;
+  /** Raw number of explicit votes (for display counts, not scoring). */
+  voteCount: number;
 }
 
 export interface PlaceScoreResult {
@@ -50,12 +82,13 @@ export function computePlaceScore(
   let voteCount = 0;
 
   for (const s of submissions) {
-    // Submitter counts as one implicit upvote on their own submission.
-    const positive = s.upvotes + 1;
-    const total = positive + s.downvotes;
+    // Submitter counts as one implicit (trust-weighted) upvote on their own
+    // submission.
+    const positive = s.upvoteWeight + s.submitterWeight;
+    const total = positive + s.downvoteWeight;
     const weight = wilsonLowerBound(positive, total);
     weightByStatus.set(s.status, (weightByStatus.get(s.status) ?? 0) + weight);
-    voteCount += s.upvotes + s.downvotes;
+    voteCount += s.voteCount;
   }
 
   let winner: VeganStatus | null = null;
