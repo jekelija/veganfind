@@ -36,3 +36,10 @@ Community-driven vegan food map (HappyCow alternative), launching Seattle-only. 
 ## Environment
 
 `.env.local` (never committed): `DATABASE_URL` (Postgres; migrations + seed + API), `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` (optional — enables auth), `NEXT_PUBLIC_MAP_STYLE_URL` (see `.env.example`). Node is pinned by `.nvmrc` (22). Supabase magic links require `<origin>/auth/callback` in the project's auth redirect allowlist.
+
+### Supabase connection architecture
+
+- `DATABASE_URL` is the **Transaction pooler** URI (`aws-…pooler.supabase.com:6543`) — the app is serverless (Vercel), which is what transaction mode is for, and it works over IPv4. Transaction mode does NOT support prepared statements; `lib/db/index.ts` sets `prepare: false` for exactly this reason — don't remove it, and don't switch drivers to one that prepares by default.
+- Direct connection (`db.<ref>.supabase.co:5432`) is for persistent servers and is IPv6-only without a paid add-on — not our default. The Session pooler (same pooler host, port 5432) is only the IPv4 stand-in for direct.
+- **Wrinkle — migrations/DDL:** Supabase recommends the direct connection for DDL tooling. `drizzle-kit migrate` works through the transaction pooler in practice at this schema size, but if a migration hangs or errors on port 6543, re-run that one command with the Session pooler string (port 5432, prepared statements supported) rather than changing `DATABASE_URL` or buying the IPv4 add-on.
+- Dashboard posture (deliberate, matches the single data-access path rule): **Data API (PostgREST) disabled**, auto-expose new tables off, **automatic RLS on** (deny-by-default backstop; our own connection is unaffected because the connecting role owns the tables and owners bypass RLS).

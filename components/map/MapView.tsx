@@ -25,9 +25,12 @@ import {
   type StatusFilter,
 } from "@/components/format";
 
+// Default style: OpenFreeMap Liberty — free for production, no API key.
+// Attribution (OpenFreeMap / OpenMapTiles / OSM) comes from the style itself
+// via MapLibre's AttributionControl.
 const STYLE_URL =
   process.env.NEXT_PUBLIC_MAP_STYLE_URL ??
-  "https://demotiles.maplibre.org/style.json";
+  "https://tiles.openfreemap.org/styles/liberty";
 
 // Serve the worker from public/ (copied by scripts/copy-maplibre-worker.mjs):
 // bundlers hash MapLibre's separate worker file without rewriting its internal
