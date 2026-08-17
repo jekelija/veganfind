@@ -8,6 +8,8 @@ import { useUser } from "@/lib/auth/useUser";
 import { OSM_ATTRIBUTION, type PlaceSummary } from "@/lib/types";
 import type { StatusFilter } from "@/components/format";
 import Legend from "@/components/map/Legend";
+import SearchBox from "@/components/map/SearchBox";
+import type { MapFlyTarget } from "@/components/map/types";
 import AddPlaceForm from "@/components/map/AddPlaceForm";
 import PlaceList from "@/components/map/PlaceList";
 import PlaceDetailPanel from "@/components/place/PlaceDetailPanel";
@@ -48,6 +50,7 @@ export default function MapApp() {
   const [places, setPlaces] = useState<PlaceSummary[]>([]);
   const [view, setView] = useState<"map" | "list">("map");
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [flyTarget, setFlyTarget] = useState<MapFlyTarget | null>(null);
 
   const refetchPlaces = useCallback(() => setRefreshKey((k) => k + 1), []);
   const handleDataLoaded = useCallback((loaded: PlaceSummary[]) => {
@@ -62,6 +65,12 @@ export default function MapApp() {
     [],
   );
   const closePanel = useCallback(() => setSelectedId(null), []);
+  const handleSearchSelect = useCallback((target: MapFlyTarget) => {
+    // Spread into a fresh object: MapView reacts to identity, so picking
+    // the same result twice still re-flies the camera.
+    setFlyTarget({ ...target });
+    setView("map"); // flying somewhere only makes sense on the map
+  }, []);
 
   function startAddMode() {
     setSelectedId(null);
@@ -91,11 +100,18 @@ export default function MapApp() {
         refreshKey={refreshKey}
         addMode={addMode}
         pendingPin={pendingPin}
+        flyTarget={flyTarget}
         onSelectPlace={handleSelectPlace}
         onPickLocation={handlePickLocation}
         onDataLoaded={handleDataLoaded}
         onLoadError={setLoadError}
       />
+
+      {/* Address / neighborhood search. Full-width top row on small screens
+          (legend/add controls drop to top-16 there); centered on md+. */}
+      <div className="absolute inset-x-3 top-3 z-20 md:inset-x-auto md:left-1/2 md:w-96 md:-translate-x-1/2">
+        <SearchBox onSelect={handleSearchSelect} />
+      </div>
 
       {/* Screen-reader announcements: places loaded (polite), errors (assertive). */}
       <LiveAnnouncer
@@ -119,8 +135,9 @@ export default function MapApp() {
         {view === "map" ? t("listToggleShow") : t("listToggleHide")}
       </button>
 
-      {/* Top-right: add-a-place entry point (auth-aware) */}
-      <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-2">
+      {/* Top-right: add-a-place entry point (auth-aware). top-16 under the
+          full-width search row on small screens. */}
+      <div className="absolute right-3 top-16 z-10 flex flex-col items-end gap-2 md:top-3">
         {auth.loading ? null : !auth.authConfigured ? (
           <span className="rounded-full border border-neutral-200 bg-white/95 px-3 py-1.5 text-xs text-neutral-600 shadow-md backdrop-blur dark:border-neutral-700 dark:bg-neutral-900/95 dark:text-neutral-300">
             {t("readOnlyBadge")}
@@ -161,7 +178,7 @@ export default function MapApp() {
 
       {/* Add-mode hint */}
       {addMode && !pendingPin && (
-        <div className="pointer-events-none absolute inset-x-0 top-14 z-10 flex justify-center px-4">
+        <div className="pointer-events-none absolute inset-x-0 top-28 z-10 flex justify-center px-4 md:top-16">
           <p className="rounded-full bg-neutral-900/85 px-4 py-2 text-xs font-medium text-white shadow-lg backdrop-blur dark:bg-white/90 dark:text-neutral-900">
             {t("dropPinHint")}
           </p>

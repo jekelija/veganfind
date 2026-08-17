@@ -2,7 +2,7 @@
 
 # VeganFind — project context
 
-Community-driven vegan food map (HappyCow alternative), launching Seattle-only. **PLAN.md is the roadmap and the source of truth for architecture decisions — read it before structural changes.** Milestones M1 (read-only map), M2 (auth/submissions/voting), and M3 (trust & moderation: vote-weight dampening, flags + admin review queue at `/[locale]/admin`, Postgres-backed rate limiting) are built and verified; next up per PLAN.md: M4 (launch polish + GDPR package).
+Community-driven vegan food map (HappyCow alternative), launching Seattle-only. **PLAN.md is the roadmap and the source of truth for architecture decisions — read it before structural changes.** Milestones M1 (read-only map), M2 (auth/submissions/voting), and M3 (trust & moderation: vote-weight dampening, flags + admin review queue at `/[locale]/admin`, Postgres-backed rate limiting) are built and verified; next up per PLAN.md: M4 (launch polish + GDPR package; its Photon search box is already built — `components/map/SearchBox.tsx` — along with a map geolocate control).
 
 ## Commands
 

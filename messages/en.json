@@ -65,7 +65,19 @@
     "dropPinHint": "Click the map where the place is to drop a pin",
     "listToggleShow": "Show list view",
     "listToggleHide": "Show map view",
-    "placesShown": "{count, plural, one {# place shown} other {# places shown}}"
+    "placesShown": "{count, plural, one {# place shown} other {# places shown}}",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "locateMe": "Show my location",
+    "locateUnavailable": "Location unavailable"
+  },
+  "search": {
+    "label": "Search for an address or neighborhood",
+    "placeholder": "Search address or neighborhood…",
+    "searching": "Searching…",
+    "noResults": "No results for \"{query}\"",
+    "error": "Search failed — please try again.",
+    "resultsCount": "{count, plural, one {# result} other {# results}}"
   },
   "placeList": {
     "title": "Places in view",

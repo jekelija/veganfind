@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import {
+  GeolocateControl,
   Map as MapLibreMap,
   Marker,
   NavigationControl,
@@ -19,6 +20,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import type { FeatureCollection, Point } from "geojson";
 import { LAUNCH_REGION } from "@/lib/region";
 import type { PlacesResponse, PlaceSummary } from "@/lib/types";
+import type { MapFlyTarget } from "@/components/map/types";
 import {
   STATUS_COLORS,
   UNKNOWN_STROKE,
@@ -50,6 +52,11 @@ export interface MapViewProps {
   addMode: boolean;
   /** Pending "add a place" pin, rendered as a draggable-free marker. */
   pendingPin: { lng: number; lat: number } | null;
+  /**
+   * Camera move requested from outside the map (search). Compared by object
+   * identity — pass a NEW object per request, even for the same coordinates.
+   */
+  flyTarget: MapFlyTarget | null;
   onSelectPlace: (id: string) => void;
   onPickLocation: (loc: { lng: number; lat: number }) => void;
   /** Called with the fetched viewport places after every successful fetch. */
@@ -185,11 +192,13 @@ export default function MapView(props: MapViewProps) {
     propsRef.current = props;
   });
 
-  // Latest translator via a ref, so fetchPlaces stays referentially stable
-  // (its identity drives the map-lifecycle effect).
+  // Latest translators via refs, so fetchPlaces and the map-lifecycle effect
+  // stay referentially stable (their identities drive that effect).
   const tErrorsRef = useRef(tErrors);
+  const tRef = useRef(t);
   useEffect(() => {
     tErrorsRef.current = tErrors;
+    tRef.current = t;
   });
 
   const fetchPlaces = useCallback(async () => {
@@ -233,10 +242,32 @@ export default function MapView(props: MapViewProps) {
       zoom: LAUNCH_REGION.zoom,
       // Tile/style attribution (deliverable 6) — always visible.
       attributionControl: { compact: true },
+      // Localize the built-in control strings (i18n rule: no hardcoded
+      // user-visible English). A locale switch remounts the whole route,
+      // so reading the translator once at map creation is safe.
+      locale: {
+        "NavigationControl.ZoomIn": tRef.current("zoomIn"),
+        "NavigationControl.ZoomOut": tRef.current("zoomOut"),
+        "GeolocateControl.FindMyLocation": tRef.current("locateMe"),
+        "GeolocateControl.LocationNotAvailable": tRef.current(
+          "locateUnavailable",
+        ),
+      },
     });
     mapRef.current = map;
     map.addControl(
       new NavigationControl({ showCompass: false }),
+      "bottom-right",
+    );
+    // "Near me": flies to the browser's geolocation and shows a dot with an
+    // accuracy ring. Needs a secure context (https or localhost); the button
+    // disables itself when permission is denied or unavailable.
+    map.addControl(
+      new GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        fitBoundsOptions: { maxZoom: 15 },
+        showUserLocation: true,
+      }),
       "bottom-right",
     );
 
@@ -338,6 +369,19 @@ export default function MapView(props: MapViewProps) {
   useEffect(() => {
     void fetchPlaces();
   }, [props.filter, props.refreshKey, fetchPlaces]);
+
+  // Camera moves requested by the search box. The viewport change fires
+  // moveend, so the places refetch happens for free.
+  useEffect(() => {
+    const map = mapRef.current;
+    const target = props.flyTarget;
+    if (!map || !target) return;
+    if (target.kind === "bounds") {
+      map.fitBounds(target.bounds, { padding: 48, maxZoom: 16 });
+    } else {
+      map.flyTo({ center: [target.lng, target.lat], zoom: target.zoom });
+    }
+  }, [props.flyTarget]);
 
   // Crosshair cursor while placing a pin.
   useEffect(() => {

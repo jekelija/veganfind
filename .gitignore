@@ -45,3 +45,6 @@ next-env.d.ts
 
 # throwaway test database (tests/global-setup.ts)
 /.test-db/
+
+# local dev-server launch config (contains a machine-specific node path)
+/.claude/launch.json

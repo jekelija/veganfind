@@ -64,7 +64,10 @@ export default function Legend({
     value === "all" ? t("filterAll") : tStatus(value);
 
   return (
-    <div className="pointer-events-none absolute left-3 top-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-col items-start gap-2">
+    // top-16: stays clear of the search row (full-width on mobile at top-3;
+    // centered on md, where its 384px would still overlap a top-3 panel
+    // until ~lg widths).
+    <div className="pointer-events-none absolute left-3 top-16 z-10 flex max-w-[calc(100%-1.5rem)] flex-col items-start gap-2 lg:top-3">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
