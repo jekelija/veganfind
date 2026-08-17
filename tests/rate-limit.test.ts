@@ -1,11 +1,8 @@
 /**
- * DB-backed rate limiter tests: real Postgres at DATABASE_URL (from
- * .env.local), same as tests/api.test.ts. Windows are seeded with bulk
- * inserts instead of 30 sequential checks to keep the suite fast.
+ * DB-backed rate limiter tests: real Postgres (the embedded instance from
+ * tests/global-setup.ts — never the app database). Windows are seeded with
+ * bulk inserts instead of 30 sequential checks to keep the suite fast.
  */
-import { config } from "dotenv";
-config({ path: ".env.local" });
-
 import { afterAll, describe, expect, it } from "vitest";
 import { inArray } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";

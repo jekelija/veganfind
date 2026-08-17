@@ -7,11 +7,11 @@ Community-driven vegan food map (HappyCow alternative), launching Seattle-only. 
 ## Commands
 
 - `npm run dev` / `npm run build` — predev/prebuild hooks copy MapLibre's worker to `public/maplibre/` (see Gotchas)
-- `npm run test` — vitest; `tests/api.test.ts` needs Postgres at `DATABASE_URL` (loads `.env.local`)
+- `npm run test` — vitest; boots a throwaway embedded Postgres (`tests/global-setup.ts`), migrates it, and points `DATABASE_URL` at it. Tests never read `.env.local` and must never touch the real database — keep it that way when adding suites. `TEST_DATABASE_URL` (db name must contain "test") is the escape hatch for an externally managed test DB.
 - `npm run db:generate` / `db:migrate` — drizzle-kit (schema lives in `lib/db/schema.ts`)
 - `npm run seed` — imports the committed Overpass fixture; `npm run seed -- --live` refreshes from the real Overpass API
 - `npm run a11y` — axe scan against a running server (default http://localhost:3000); zero serious/critical is the bar
-- Verification bar for any change: `npx tsc --noEmit` + `npx eslint .` + `npm run test` + `npm run build` all clean
+- Verification bar for any change: `npx tsc --noEmit` + `npx eslint .` + `npm run test` + `npm run build` all clean — CI (`.github/workflows/ci.yml`) runs exactly this on every push/PR
 
 ## Architecture rules (violating these is a bug)
 

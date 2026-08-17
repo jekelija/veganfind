@@ -1,12 +1,9 @@
 /**
- * Integration tests for the write flows: real local Postgres (DATABASE_URL
- * from .env.local), real Drizzle + recompute, real rate limiter. Only
- * "@/lib/auth/server" is mocked so we can act as different signed-in users
- * without a Supabase instance.
+ * Integration tests for the write flows: real Postgres (the embedded
+ * instance from tests/global-setup.ts — never the app database), real
+ * Drizzle + recompute, real rate limiter. Only "@/lib/auth/server" is
+ * mocked so we can act as different signed-in users without Supabase.
  */
-import { config } from "dotenv";
-config({ path: ".env.local" });
-
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 

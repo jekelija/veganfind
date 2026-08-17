@@ -1,0 +1,35 @@
+# The full verification bar from CLAUDE.md, on every push and PR.
+# Tests boot their own embedded Postgres (tests/global-setup.ts) — no
+# service container, no secrets, nothing to configure.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Test (embedded Postgres)
+        run: npm run test
+
+      - name: Build
+        run: npm run build
